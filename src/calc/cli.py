@@ -1,14 +1,18 @@
+from collections.abc import Iterator
+from pathlib import Path
+
 from .parse import run
 
 
-def main():
-    calc = """
-x = 11
-y = -3
-x * 2 + (y - 1) / (8 * 0.5)
-"""
+def load(path: Path) -> Iterator[str]:
+    with open(path) as f:
+        for line in f:
+            if (stripped := line.strip()) != "":
+                yield stripped
 
-    expressions = [e for e in calc.splitlines() if len(e)]
+
+def main():
+    expressions = load(Path("./math.calc"))
 
     result = run(expressions)
     print(f"Result: {result}")
