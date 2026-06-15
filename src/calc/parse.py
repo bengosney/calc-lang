@@ -4,6 +4,10 @@ from collections.abc import Iterable
 parser = Lark.open("./grammars/calc.lark", rel_to=__file__, parser="earley")
 
 
+class CaclError(Exception):
+    pass
+
+
 class CalcTransformer(Transformer):
     def __init__(self):
         super().__init__()
@@ -29,6 +33,8 @@ class CalcTransformer(Transformer):
 
     def var(self, items):
         name = str(items[0])
+        if name not in self.vars:
+            raise NameError(f"Undefined variable: {name}")
         return self.vars[name]
 
     def assign_var(self, items):
@@ -39,10 +45,14 @@ class CalcTransformer(Transformer):
 
 def run(expressions: Iterable[str], debug: bool = False) -> float:
     transformer = CalcTransformer()
+    result = None
 
     for expr in expressions:
         result = transformer.transform(parser.parse(expr))
         if debug:
             print(f"{expr} => {result}")
+
+    if result is None:
+        raise CaclError("expressions returned no result")
 
     return result
