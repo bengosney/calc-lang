@@ -22,7 +22,11 @@ def main(
 ):
     expressions = load(path)
     try:
-        result = run(expressions, debug=debug)
+        result = run(
+            expressions,
+            input_resolver=lambda name: float(typer.prompt(f"Input {name}")),
+            debug=debug,
+        )
         print(f"Result: {result}")
     except CaclError as e:
         print(f"error: {e}")

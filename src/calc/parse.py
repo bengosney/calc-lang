@@ -1,6 +1,6 @@
+from collections.abc import Callable, Iterable
+
 from lark import Lark, Transformer
-from collections.abc import Iterable
-import typer
 
 parser = Lark.open("./grammars/calc.lark", rel_to=__file__, parser="earley")
 
@@ -10,9 +10,10 @@ class CaclError(Exception):
 
 
 class CalcTransformer(Transformer):
-    def __init__(self):
+    def __init__(self, input_resolver: Callable[[str], float]):
         super().__init__()
         self.vars = {}
+        self._input_resolver = input_resolver
 
     def number(self, items):
         return float(items[0])
@@ -45,11 +46,11 @@ class CalcTransformer(Transformer):
 
     def define_var(self, items):
         name = str(items[0])
-        self.vars[name] = float(typer.prompt(f"Input {name}"))
+        self.vars[name] = self._input_resolver(name)
 
 
-def run(expressions: Iterable[str], debug: bool = False) -> float:
-    transformer = CalcTransformer()
+def run(expressions: Iterable[str], input_resolver: Callable[[str], float], debug: bool = False) -> float:
+    transformer = CalcTransformer(input_resolver)
     result = None
 
     for expr in expressions:
