@@ -37,5 +37,15 @@ class CalcTransformer(Transformer):
 
 
 transformer = CalcTransformer()
-tree = parser.parse("2 + 20 / (13 - 6) + 1.5")
-print(transformer.transform(tree))
+
+calc = """
+x = 11
+y = -3
+x * 2 + (y - 1) / (8 * 0.5)
+"""
+
+expressions = [e for e in calc.splitlines() if len(e)]
+
+for expr in expressions:
+    result = transformer.transform(parser.parse(expr))
+    print(f"{expr} => {result}")
