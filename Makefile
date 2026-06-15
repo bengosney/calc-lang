@@ -74,3 +74,4 @@ clean: ## Remove all build files
 install: $(VENV_PATH) requirements.txt $(REQS) ## Install development requirements (default)
 	@echo "Installing $(filter-out $<,$^)"
 	$(UV_PATH) pip sync $(filter-out $<,$^)
+	$(UV_PATH) pip install -e .

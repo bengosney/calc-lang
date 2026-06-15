@@ -1,4 +1,5 @@
 from lark import Lark, Transformer
+from collections.abc import Iterable
 
 parser = Lark.open("./grammars/calc.lark", rel_to=__file__, parser="earley")
 
@@ -36,16 +37,11 @@ class CalcTransformer(Transformer):
         return value
 
 
-transformer = CalcTransformer()
+def run(expressions: Iterable[str]) -> float:
+    transformer = CalcTransformer()
 
-calc = """
-x = 11
-y = -3
-x * 2 + (y - 1) / (8 * 0.5)
-"""
+    for expr in expressions:
+        result = transformer.transform(parser.parse(expr))
+        print(f"{expr} => {result}")
 
-expressions = [e for e in calc.splitlines() if len(e)]
-
-for expr in expressions:
-    result = transformer.transform(parser.parse(expr))
-    print(f"{expr} => {result}")
+    return result
