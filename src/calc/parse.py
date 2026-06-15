@@ -37,11 +37,12 @@ class CalcTransformer(Transformer):
         return value
 
 
-def run(expressions: Iterable[str]) -> float:
+def run(expressions: Iterable[str], debug: bool = False) -> float:
     transformer = CalcTransformer()
 
     for expr in expressions:
         result = transformer.transform(parser.parse(expr))
-        print(f"{expr} => {result}")
+        if debug:
+            print(f"{expr} => {result}")
 
     return result

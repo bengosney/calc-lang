@@ -16,7 +16,7 @@ def load(path: Path) -> Iterator[str]:
 
 
 @app.command()
-def main(path: Path = typer.Argument(..., help="Path to .calc file")):
+def main(path: Path = typer.Argument(..., help="Path to .calc file"), debug: bool = False):
     expressions = load(path)
-    result = run(expressions)
+    result = run(expressions, debug=debug)
     print(f"Result: {result}")
