@@ -1,7 +1,11 @@
 from collections.abc import Iterator
 from pathlib import Path
 
+import typer
+
 from .parse import run
+
+app = typer.Typer()
 
 
 def load(path: Path) -> Iterator[str]:
@@ -11,8 +15,8 @@ def load(path: Path) -> Iterator[str]:
                 yield stripped
 
 
-def main():
-    expressions = load(Path("./math.calc"))
-
+@app.command()
+def main(path: Path = typer.Argument(..., help="Path to .calc file")):
+    expressions = load(path)
     result = run(expressions)
     print(f"Result: {result}")

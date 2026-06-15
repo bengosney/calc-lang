@@ -12,14 +12,14 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = [ "lark" ]
+dependencies = [ "lark", "typer" ]
 optional-dependencies.dev = [
   "icecream",
 ]
 optional-dependencies.test = [
   "pytest",
 ]
-scripts.calc = "calc.cli:main"
+scripts.calc = "calc.cli:app"
 
 [tool.setuptools]
 packages.find.where = [ "src" ]
