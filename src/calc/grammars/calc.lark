@@ -1,5 +1,6 @@
 ?start: sum
       | NAME "=" sum    -> assign_var
+      | "var" NAME      -> define_var
 
 ?sum: product
     | sum "+" product   -> add

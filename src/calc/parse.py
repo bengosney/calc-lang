@@ -1,5 +1,6 @@
 from lark import Lark, Transformer
 from collections.abc import Iterable
+import typer
 
 parser = Lark.open("./grammars/calc.lark", rel_to=__file__, parser="earley")
 
@@ -41,6 +42,10 @@ class CalcTransformer(Transformer):
         name, value = str(items[0]), items[1]
         self.vars[name] = value
         return value
+
+    def define_var(self, items):
+        name = str(items[0])
+        self.vars[name] = float(typer.prompt(f"Input {name}"))
 
 
 def run(expressions: Iterable[str], debug: bool = False) -> float:
