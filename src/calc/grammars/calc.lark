@@ -20,3 +20,4 @@
 %import common.WS_INLINE
 
 %ignore WS_INLINE
+%ignore /#[^\n]*/
