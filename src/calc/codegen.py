@@ -1,5 +1,3 @@
-from collections.abc import Iterable
-
 import llvmlite.ir as ir
 from lark import Transformer
 
@@ -43,6 +41,12 @@ class LLVMTransformer(Transformer):
         self._builder.store(value, self._vars[name])
         return value
 
+    def expr(self, items):
+        return items[0]
+
+    def start(self, items):
+        return [v for v in items if v is not None]
+
     def define_var(self, items):
         name = str(items[0])
         name_const = ir.Constant(
@@ -59,7 +63,7 @@ class LLVMTransformer(Transformer):
         self._builder.store(value, ptr)
 
 
-def compile_to_ir(expressions: Iterable[str]) -> str:
+def compile_to_ir(source: str) -> str:
     module = ir.Module(name="calc")
     module.triple = "x86_64-pc-linux-gnu"
 
@@ -88,15 +92,13 @@ def compile_to_ir(expressions: Iterable[str]) -> str:
     vars: dict[str, ir.AllocaInstr] = {}
     transformer = LLVMTransformer(builder, vars, input_fn)
 
-    result = None
-    for expr in expressions:
-        result = transformer.transform(parser.parse(expr))
+    results = transformer.transform(parser.parse(source))
 
-    if result is None:
+    if not results:
         raise ValueError("expressions produced no result")
 
     fmt_ptr = builder.bitcast(fmt_global, i8_ptr)
-    builder.call(printf_fn, [fmt_ptr, result])
+    builder.call(printf_fn, [fmt_ptr, results[-1]])
     builder.ret(ir.Constant(i32, 0))
 
     return str(module)

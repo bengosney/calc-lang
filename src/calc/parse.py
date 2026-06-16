@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 
 from lark import Lark, Transformer
 
@@ -48,17 +48,22 @@ class CalcTransformer(Transformer):
         name = str(items[0])
         self.vars[name] = self._input_resolver(name)
 
+    def expr(self, items):
+        return items[0]
 
-def run(expressions: Iterable[str], input_resolver: Callable[[str], float], debug: bool = False) -> float:
+    def start(self, items):
+        return [v for v in items if v is not None]
+
+
+def run(source: str, input_resolver: Callable[[str], float], debug: bool = False) -> float:
     transformer = CalcTransformer(input_resolver)
-    result = None
+    results = transformer.transform(parser.parse(source))
 
-    for expr in expressions:
-        result = transformer.transform(parser.parse(expr))
-        if debug:
-            print(f"{expr} => {result}")
-
-    if result is None:
+    if not results:
         raise CaclError("expressions returned no result")
 
-    return result
+    if debug:
+        for result in results:
+            print(f"=> {result}")
+
+    return results[-1]
