@@ -47,12 +47,13 @@ class CalcTransformer(Transformer):
     def define_var(self, items):
         name = str(items[0])
         self.vars[name] = self._input_resolver(name)
+        return self.vars[name]
 
     def expr(self, items):
         return items[0]
 
     def start(self, items):
-        return [v for v in items if v is not None]
+        return [v for v in items]
 
 
 def run(source: str, input_resolver: Callable[[str], float], debug: bool = False) -> float:
@@ -63,11 +64,7 @@ def run(source: str, input_resolver: Callable[[str], float], debug: bool = False
         raise CaclError("expressions returned no result")
 
     if debug:
-        lines = [
-            line.strip()
-            for line in source.splitlines()
-            if line.strip() and not line.strip().startswith("#") and not line.strip().startswith("var ")
-        ]
+        lines = [line for line in (s.strip() for s in source.splitlines()) if line and not line.startswith("#")]
         for line, result in zip(lines, results):
             print(f"{line} => {result}")
 
