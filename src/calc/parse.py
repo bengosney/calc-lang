@@ -63,7 +63,12 @@ def run(source: str, input_resolver: Callable[[str], float], debug: bool = False
         raise CaclError("expressions returned no result")
 
     if debug:
-        for result in results:
-            print(f"=> {result}")
+        lines = [
+            line.strip()
+            for line in source.splitlines()
+            if line.strip() and not line.strip().startswith("#") and not line.strip().startswith("var ")
+        ]
+        for line, result in zip(lines, results):
+            print(f"{line} => {result}")
 
     return results[-1]
