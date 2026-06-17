@@ -13,16 +13,21 @@ app = typer.Typer()
 def main(
     path: Path = typer.Argument(..., help="Path to .calc file"),
     debug: bool = typer.Option(False, "--debug", help="Print each expression and its result"),
-    compile: Path | None = typer.Option(None, "--compile", help="Compile to LLVM IR and write to this path"),
+    compile: bool = typer.Option(False, "--compile", "-c", help="Compile to LLVM IR and native binary"),
 ):
     source = path.read_text()
 
-    if compile is not None:
+    if compile:
+        output_path = path.with_suffix("")
+        ir_path = output_path.with_suffix(".ll")
         ir = compile_to_ir(source)
-        compile.with_suffix(".ll").write_text(ir)
-        typer.echo(f"IR written to {compile}")
-        typer.echo("Compiling IR")
-        subprocess.run(["clang", "runtime.c", compile.with_suffix(".ll"), "-o", compile])
+        ir_path.write_text(ir)
+        typer.echo(f"IR written to {ir_path}")
+
+        clang_args = ["clang", "runtime.c", str(ir_path), "-o", str(output_path)]
+        typer.echo(f"Compiling IR with: {' '.join(clang_args)}")
+        subprocess.run(clang_args)
+
         return
 
     try:
