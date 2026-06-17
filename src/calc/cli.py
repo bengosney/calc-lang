@@ -14,6 +14,7 @@ def main(
     path: Path = typer.Argument(..., help="Path to .calc file"),
     debug: bool = typer.Option(False, "--debug", help="Print each expression and its result"),
     compile: bool = typer.Option(False, "--compile", "-c", help="Compile to LLVM IR and native binary"),
+    optimization: int = typer.Option("0", "--optimization", "-O", help="Clang optimization level"),
 ):
     source = path.read_text()
 
@@ -24,7 +25,7 @@ def main(
         ir_path.write_text(ir)
         typer.echo(f"IR written to {ir_path}")
 
-        clang_args = ["clang", "runtime.c", str(ir_path), "-o", str(output_path)]
+        clang_args = ["clang", f"-O{optimization}", "runtime.c", str(ir_path), "-o", str(output_path)]
         typer.echo(f"Compiling IR with: {' '.join(clang_args)}")
         subprocess.run(clang_args)
 
